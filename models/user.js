@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const uniqueValidator = require('mongoose-unique-validator')
 
-const user = new Schema({
+const userSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -10,11 +10,12 @@ const user = new Schema({
   frames: {
     type: Array,
   },
-  facebookID: {
+  facebookId: {
     type: String,
     required: true,
   },
 })
+
 userSchema.plugin(uniqueValidator)
 const User = mongoose.model('user', userSchema)
 

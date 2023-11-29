@@ -1,9 +1,9 @@
-import { User } from '../models/user'
-import { signupOrsignin } from '../utils/user'
+const { User } = require('../models/user')
+const signupOrsignin = require('../utils/user')
 const jwt = require('jwt-simple')
-import config from '../config/config'
+const config = require('../config/config')
 
-export async function createOrLoginUser(req, res) {
+module.exports = createOrLoginUser = async (req, res) => {
   const user = req.body
 
   try {
@@ -15,5 +15,19 @@ export async function createOrLoginUser(req, res) {
     if (!newUser.user) {
       throw new Error(newUser.error)
     }
-  } catch (error) {}
+    const playload = {
+      id: user.facebookId,
+      name: user.name,
+      expire: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    }
+
+    const token = jwt.encode(playload, config.jwtSecret)
+    res.status(200).json({
+      userId: user,
+      token: `Bearer ${token}`,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(403).json(error.massage)
+  }
 }

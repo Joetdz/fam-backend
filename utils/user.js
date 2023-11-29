@@ -1,4 +1,4 @@
-export async function signupOrsignin(user, User) {
+module.exports = signupOrsignin = async (user, User) => {
   try {
     const userExist = await User.findOne({
       facebookId: user.facebookId,

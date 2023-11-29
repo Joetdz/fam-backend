@@ -3,6 +3,7 @@ const cors = require('cors')
 const app = express()
 const dotenv = require('dotenv')
 const mongoose = require('mongoose')
+const userRouter = require('.//routes/user')
 dotenv.config()
 const corsOption = {
   origin: '*',
@@ -16,6 +17,7 @@ mongoose
   .catch((error) => console.log(error))
 
 app.use(express.json())
+app.use('/user', userRouter)
 app.listen(port, () => {
   console.log('Server is running on port ', port)
 })
