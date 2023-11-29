@@ -27,19 +27,19 @@ const createFrame = async (req, res) => {
 
 const getAllFrames = async (req, res) => {
   const { createdBy } = req.query
+  console.log('createdBy', createdBy)
   try {
-    let allFrames = null
+    let allFrames = []
     const filter = {}
     if (createdBy) {
-      filter.createBy = createdBy
-
+      filter.createdBy = createdBy
       allFrames = await getFramelist(Frame, filter)
-      if (!allFrames) {
+      if (allFrames && allFrames.frames.length == 0) {
         throw new Error('pas de frames crée par cet utilisateur')
       }
 
       res.status(200).json({
-        frames: allFrames,
+        frames: allFrames.frames,
         messega: 'Tous les frames recupérés avec succès ft',
       })
     } else {
