@@ -1,4 +1,4 @@
-module.exports = insertFrame = async (frame, Frame, User) => {
+const insertFrame = async (frame, Frame, User) => {
   try {
     const frameExist = await Frame.findOne({
       name: frame.name,
@@ -9,19 +9,19 @@ module.exports = insertFrame = async (frame, Frame, User) => {
       )
     }
     const userCheck = await User.findOne({
-      facebookId: frame.createBy,
+      facebookId: frame.createdBy,
     })
     if (!userCheck) {
       throw new Error('Utilisateur introuvable')
-    } else if (userCheck.abonnement >= 0) {
+    } else if (userCheck.abonnement <= 0) {
       throw new Error(' avez plus d abonnement pour creer ce frame')
     }
 
     let newFrame = null
     newFrame = await Frame.create(frame)
     const userUpdate = await User.update(
-      { facebookId: frame.createBy },
-      { $push: { frames: newFrame.name } }
+      { facebookId: frame.createdBy },
+      { $push: { frames: newFrame.name }, abonnement: userCheck.abonnement - 1 }
     )
     if (!userUpdate) {
       throw new Error(
@@ -35,7 +35,37 @@ module.exports = insertFrame = async (frame, Frame, User) => {
   } catch (error) {
     return {
       frame: null,
-      error: error.massage,
+      error: error,
     }
   }
 }
+
+const getFramelist = async (Frame, filter) => {
+  try {
+    if (filter) {
+      const frames = await Frame.find({ where: filter })
+      if (!frames) {
+        throw new Error('Aucun frame trouvé')
+      }
+      return {
+        frames: frames,
+        error: null,
+      }
+    } else {
+      const frames = await Frame.find()
+      if (!frames) {
+        throw new Error('Aucun frame trouvé')
+      }
+      return {
+        frames: frames,
+        error: null,
+      }
+    }
+  } catch (error) {
+    return {
+      frames: null,
+      error: error.message,
+    }
+  }
+}
+module.exports = { insertFrame, getFramelist }
