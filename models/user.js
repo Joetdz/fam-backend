@@ -14,6 +14,9 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  abonnement: {
+    type: Number,
+  },
 })
 
 userSchema.plugin(uniqueValidator)
