@@ -62,4 +62,34 @@ const getFramelist = async (Frame, filter) => {
     }
   }
 }
-module.exports = { insertFrame, getFramelist }
+
+const fetchImage = async (url) => {
+  const response = await fetch(url)
+
+  return response
+}
+
+const poseFrame = async (imageUrl, frameUrl) => {
+  // Récupère l'image
+  const imageBlob = await fs.promises.readFile(imageUrl)
+  const image = await canvas.loadImage(imageBlob)
+
+  // Récupère le cadre
+  const frameBlob = await fs.promises.readFile(frameUrl)
+  const frame = await canvas.loadImage(frameBlob)
+
+  // Crée un objet Canvas
+  const canvas = canvas.createCanvas(image.width, image.height)
+
+  // Dessine l'image sur le Canvas
+  const context = canvas.getContext('2d')
+  context.drawImage(image, 0, 0)
+
+  // Dessine le cadre sur le Canvas
+  context.drawImage(frame, 0, 0)
+
+  // Retourne l'image
+  return canvas.toBuffer('image/png')
+}
+
+module.exports = { insertFrame, getFramelist, poseFrame, fetchImage }
