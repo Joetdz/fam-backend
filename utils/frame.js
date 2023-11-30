@@ -1,13 +1,5 @@
 const insertFrame = async (frame, Frame, User) => {
   try {
-    const frameExist = await Frame.findOne({
-      name: frame.name,
-    })
-    if (frameExist) {
-      throw new Error(
-        `Il  existe déjà un frame qui porte ce nom : ${frameExist.name}`
-      )
-    }
     const userCheck = await User.findOne({
       facebookId: frame.createdBy,
     })
