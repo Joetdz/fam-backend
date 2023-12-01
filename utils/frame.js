@@ -8,9 +8,10 @@ const insertFrame = async (frame, Frame, User) => {
     })
     if (!userCheck) {
       throw new Error('Utilisateur introuvable')
-    } else if (userCheck.abonnement <= 0) {
-      throw new Error(' avez plus d abonnement pour creer ce frame')
     }
+    // } else if (userCheck.abonnement <= 0) {
+    //   throw new Error('Vous  n avez plus d abonnement pour creer ce frame')
+    // }
 
     let newFrame = null
     newFrame = await Frame.create(frame)
