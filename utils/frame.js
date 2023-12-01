@@ -1,3 +1,6 @@
+const axios = require('axios')
+const { createCanvas, loadImage } = require('canvas')
+
 const insertFrame = async (frame, Frame, User) => {
   try {
     const userCheck = await User.findOne({
@@ -55,33 +58,57 @@ const getFramelist = async (Frame, filter) => {
   }
 }
 
-const fetchImage = async (url) => {
-  const response = await fetch(url)
-
-  return response
+const uploadFile = async (file, precept) => {
+  try {
+    const formdata = new FormData()
+    formdata.append('file', file)
+    formdata.append('upload_preset', precept)
+    const { data } = await axios.post(
+      `${process.env.CLOUD_URL}/${process.env.CLOUD_NAME}/image/upload`,
+      formdata
+    )
+    return data.url
+  } catch (error) {
+    console.log(error)
+    return null
+  }
 }
 
 const poseFrame = async (imageUrl, frameUrl) => {
-  // Récupère l'image
-  const imageBlob = await fs.promises.readFile(imageUrl)
-  const image = await canvas.loadImage(imageBlob)
+  // Récupérer l'image et le frame à partir des URL
+  try {
+    const [image, frame] = await Promise.all([
+      loadImage(imageUrl),
+      loadImage(frameUrl),
+    ])
 
-  // Récupère le cadre
-  const frameBlob = await fs.promises.readFile(frameUrl)
-  const frame = await canvas.loadImage(frameBlob)
+    // Créer un canevas de la taille de l'image
+    const canvas = createCanvas(image.width, image.height)
+    const ctx = canvas.getContext('2d')
 
-  // Crée un objet Canvas
-  const canvas = canvas.createCanvas(image.width, image.height)
+    // Dessiner l'image sur le canevas
+    ctx.drawImage(image, 0, 0, image.width, image.height)
 
-  // Dessine l'image sur le Canvas
-  const context = canvas.getContext('2d')
-  context.drawImage(image, 0, 0)
+    // Dessiner le frame sur l'image
+    ctx.drawImage(frame, 0, 0, image.width, image.height)
 
-  // Dessine le cadre sur le Canvas
-  context.drawImage(frame, 0, 0)
+    // Convertir le canevas en une image base64
+    const combinedImage = canvas.toDataURL('image/png')
+    if (!combinedImage) {
+      throw new Error(
+        "Quelque chose s'est mal passé lors de l'association du frame et l'image"
+      )
+    }
+    const finalImageUrl = await uploadFile(combinedImage, process.env.PRECEPT)
+    if (!finalImageUrl) {
+      throw new Error("Impossible d'envoyer L'image à cloudinary")
+    }
 
-  // Retourne l'image
-  return canvas.toBuffer('image/png')
+    return {
+      finalImageUrl: finalImageUrl,
+    }
+  } catch (error) {
+    console.log('err', error)
+  }
 }
-
-module.exports = { insertFrame, getFramelist, poseFrame, fetchImage }
+module.exports = { insertFrame, getFramelist, poseFrame }

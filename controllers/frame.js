@@ -60,20 +60,16 @@ const getAllFrames = async (req, res) => {
     }
   } catch (error) {
     console.log(error)
-    res.status(403).json(error.massage)
+    res.status(501).json(error)
   }
 }
 
 const createFanFram = async (req, res) => {
   const { imgUrl, frameUrl } = req.body
-  const image = await fetchImage(imgUrl)
-  const frame = await fetchImage(frameUrl)
-  const result = poseFrame(image, frame, {
-    offsetX: 10,
-    offsetY: 20,
-    resize: 'image',
-    opacity: 0.5,
-  })
+
+  // console.log('url', imgUrl, frameUrl)
+
+  const result = await poseFrame(imgUrl, frameUrl)
   res.status(200).json({
     frames: result,
   })
