@@ -1,6 +1,11 @@
 const { User } = require('../models/user')
 const { Frame } = require('..//models/frame')
-const { insertFrame, getFramelist } = require('../utils/frame')
+const {
+  insertFrame,
+  getFramelist,
+  poseFrame,
+  fetchImage,
+} = require('../utils/frame')
 
 const createFrame = async (req, res) => {
   const frame = req.body
@@ -59,4 +64,19 @@ const getAllFrames = async (req, res) => {
   }
 }
 
-module.exports = { getAllFrames, createFrame }
+const createFanFram = async (req, res) => {
+  const { imgUrl, frameUrl } = req.body
+  const image = await fetchImage(imgUrl)
+  const frame = await fetchImage(frameUrl)
+  const result = poseFrame(image, frame, {
+    offsetX: 10,
+    offsetY: 20,
+    resize: 'image',
+    opacity: 0.5,
+  })
+  res.status(200).json({
+    frames: result,
+  })
+}
+
+module.exports = { getAllFrames, createFrame, createFanFram }

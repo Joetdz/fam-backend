@@ -3,7 +3,7 @@ const signupOrsignin = require('../utils/user')
 const jwt = require('jwt-simple')
 const config = require('../config/config')
 
-module.exports = createOrLoginUser = async (req, res) => {
+const createOrLoginUser = async (req, res) => {
   const user = req.body
 
   try {
@@ -31,3 +31,4 @@ module.exports = createOrLoginUser = async (req, res) => {
     res.status(403).json(error.massage)
   }
 }
+module.exports = { createOrLoginUser }
