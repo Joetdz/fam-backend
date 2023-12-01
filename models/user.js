@@ -16,6 +16,7 @@ const userSchema = new Schema({
   },
   abonnement: {
     type: Number,
+    default: 0,
   },
 })
 

@@ -25,8 +25,8 @@ const createFrame = async (req, res) => {
       message: `Le frame a été  créé avec succès`,
     })
   } catch (error) {
-    console.log(error)
-    res.status(403).json(error.massage)
+    console.log(error.message)
+    res.status(500).json({ error })
   }
 }
 
