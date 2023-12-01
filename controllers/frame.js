@@ -10,7 +10,7 @@ const {
 const createFrame = async (req, res) => {
   const frame = req.body
   try {
-    if (!frame.name && !frame.createBy) {
+    if (!frame.name && !frame.createdBy) {
       throw new Error(
         'Imposible de créer le frame sans le nom et sans être membre'
       )
