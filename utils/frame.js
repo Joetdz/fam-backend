@@ -38,10 +38,10 @@ const getFramelist = async(Frame, filter) => {
     try {
 
         const frames =
-            filter && filter.createdBy && !filter.searchQuery ?
+            filter && filter.createdBy && !filter.query ?
             await Frame.find({ createdBy: { $eq: filter.createdBy } }) :
-            filter && filter.searchQuery ?
-            await Frame.find({ $or: [{ name: { $regex: new RegExp(filter.searchQuery, "i") } }, { description: { $regex: new RegExp(filter.searchQuery, "i") } }] }) :
+            filter && filter.query ?
+            await Frame.find({ $or: [{ name: { $regex: new RegExp(filter.query, "i") } }, { description: { $regex: new RegExp(filter.query, "i") } }] }) :
             await Frame.find()
 
         if (!frames || frames.length === 0) {
