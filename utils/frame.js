@@ -38,15 +38,18 @@ const insertFrame = async (frame, Frame, User) => {
 const getFramelist = async (Frame, filter) => {
   console.log('filter', filter)
 
-    try {
-
-        const frames =
-            filter && filter.createdBy && !filter.query ?
-            await Frame.find({ createdBy: { $eq: filter.createdBy } }) :
-            filter && filter.query ?
-            await Frame.find({ $or: [{ name: { $regex: new RegExp(filter.query, "i") } }, { description: { $regex: new RegExp(filter.query, "i") } }] }) :
-            await Frame.find()
-
+  try {
+    const frames =
+      filter && filter.createdBy && !filter.query
+        ? await Frame.find({ createdBy: { $eq: filter.createdBy } })
+        : filter && filter.query
+          ? await Frame.find({
+              $or: [
+                { name: { $regex: new RegExp(filter.query, 'i') } },
+                { description: { $regex: new RegExp(filter.query, 'i') } },
+              ],
+            })
+          : await Frame.find()
 
     if (!frames || frames.length === 0) {
       throw new Error('Aucun frame trouvé')
@@ -100,13 +103,24 @@ const uploadFile = async (file, precept) => {
   }
 }
 
-const poseFrame = async (imageUrl, frameUrl) => {
+const poseFrame = async (imageUrl, frameId, frameEntity) => {
   // Récupérer l'image et le frame à partir des URL
   try {
-    const [image, frame] = await Promise.all([
-      loadImage(imageUrl),
-      loadImage(frameUrl),
-    ])
+    const frameExist = await frameEntity.findOne({
+      _id: { $eq: frameId },
+    })
+
+    if (!frameExist) {
+      throw new Error('Frame introuvable')
+    }
+
+    const frame = await loadImage(frameExist.imgUrl)
+
+    const image = await loadImage(imageUrl)
+
+    if (!image) {
+      throw new Error('Impossible de charger le frame')
+    }
 
     // Créer un canevas de la taille de l'image
     const canvas = createCanvas(image.width, image.height)
@@ -134,7 +148,7 @@ const poseFrame = async (imageUrl, frameUrl) => {
       finalImageUrl: finalImageUrl,
     }
   } catch (error) {
-    console.log('err', error)
+    return error
   }
 }
 module.exports = { insertFrame, getFramelist, poseFrame, getSingleFrame }
