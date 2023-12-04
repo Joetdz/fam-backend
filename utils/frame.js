@@ -38,10 +38,15 @@ const insertFrame = async (frame, Frame, User) => {
 const getFramelist = async (Frame, filter) => {
   console.log('filter', filter)
 
-  try {
-    const frames = filter
-      ? await Frame.find({ createdBy: { $eq: filter.createdBy } })
-      : await Frame.find()
+    try {
+
+        const frames =
+            filter && filter.createdBy && !filter.query ?
+            await Frame.find({ createdBy: { $eq: filter.createdBy } }) :
+            filter && filter.query ?
+            await Frame.find({ $or: [{ name: { $regex: new RegExp(filter.query, "i") } }, { description: { $regex: new RegExp(filter.query, "i") } }] }) :
+            await Frame.find()
+
 
     if (!frames || frames.length === 0) {
       throw new Error('Aucun frame trouvé')

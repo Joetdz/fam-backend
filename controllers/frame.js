@@ -30,28 +30,41 @@ const createFrame = async (req, res) => {
   }
 }
 
-const getAllFrames = async (req, res) => {
-  const { createdBy } = req.query
-  console.log('createdBy', createdBy)
-  try {
-    let allFrames = []
-    const filter = {}
-    if (createdBy) {
-      filter.createdBy = createdBy
-      allFrames = await getFramelist(Frame, filter)
-      if (allFrames && allFrames.frames.length == 0) {
-        throw new Error('pas de frames crée par cet utilisateur')
-      }
+const getAllFrames = async(req, res) => {
+    const { createdBy, query } = req.query
+    console.log('createdBy', createdBy)
+    try {
+        let allFrames = []
+        const filter = {}
+        if (createdBy) {
+            filter.createdBy = createdBy
+            allFrames = await getFramelist(Frame, filter)
+            if (allFrames && allFrames.frames.length == 0) {
+                throw new Error('pas de frames crée par cet utilisateur')
+            }
 
-      res.status(200).json({
-        frames: allFrames.frames,
-        messega: 'Tous les frames recupérés avec succès ft',
-      })
-    } else {
-      allFrames = await getFramelist(Frame)
-      if (!allFrames) {
-        throw new Error('pas de frames crée par cet utilisateur')
-      }
+            res.status(200).json({
+                frames: allFrames.frames,
+                messega: 'Tous les frames recupérés avec succès ft',
+            })
+        } else if (query) {
+
+            filter.query = query
+            allFrames = await getFramelist(Frame, filter)
+            if (allFrames && allFrames.frames.length == 0) {
+                throw new Error('pas de frames crée par cet utilisateur')
+            }
+
+            res.status(200).json({
+                frames: allFrames.frames,
+                messega: 'Tous les frames recupérés avec succès ft',
+            })
+        } else {
+            allFrames = await getFramelist(Frame)
+            if (!allFrames) {
+                throw new Error('pas de frames crée par cet utilisateur')
+            }
+
 
       res.status(200).json({
         frames: allFrames,
@@ -64,28 +77,7 @@ const getAllFrames = async (req, res) => {
   }
 }
 
-const getOneFrame = async (req, res) => {
-  const { id } = req.params
-  try {
-    let frame = {}
-    const filter = {}
-    if (id) {
-      filter.id = id
-      frame = await getSingleFrame(Frame, filter)
-      if (!frame) {
-        throw new Error('pas de frame trouvé')
-      }
 
-      res.status(200).json({
-        frame: frame,
-        message: 'Frame trouvé',
-      })
-    }
-  } catch (error) {
-    console.log(error)
-    res.status(501).json(error)
-  }
-}
 
 const getOneFrame = async (req, res) => {
   const { id } = req.params
@@ -110,28 +102,7 @@ const getOneFrame = async (req, res) => {
   }
 }
 
-const getOneFrame = async (req, res) => {
-  const { id } = req.params
-  try {
-    let frame = {}
-    const filter = {}
-    if (id) {
-      filter.id = id
-      frame = await getSingleFrame(Frame, filter)
-      if (!frame) {
-        throw new Error('pas de frame trouvé')
-      }
 
-      res.status(200).json({
-        frame: frame,
-        message: 'Frame trouvé',
-      })
-    }
-  } catch (error) {
-    console.log(error)
-    res.status(501).json(error)
-  }
-}
 
 const createFanFram = async (req, res) => {
   const { imgUrl, frameUrl } = req.body
