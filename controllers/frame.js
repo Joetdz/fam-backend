@@ -4,7 +4,7 @@ const {
   insertFrame,
   getFramelist,
   poseFrame,
-  fetchImage,
+  getSingleFrame,
 } = require('../utils/frame')
 
 const createFrame = async (req, res) => {
@@ -64,15 +64,84 @@ const getAllFrames = async (req, res) => {
   }
 }
 
+const getOneFrame = async (req, res) => {
+  const { id } = req.params
+  try {
+    let frame = {}
+    const filter = {}
+    if (id) {
+      filter.id = id
+      frame = await getSingleFrame(Frame, filter)
+      if (!frame) {
+        throw new Error('pas de frame trouvé')
+      }
+
+      res.status(200).json({
+        frame: frame,
+        message: 'Frame trouvé',
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(501).json(error)
+  }
+}
+
+const getOneFrame = async (req, res) => {
+  const { id } = req.params
+  try {
+    let frame = {}
+    const filter = {}
+    if (id) {
+      filter.id = id
+      frame = await getSingleFrame(Frame, filter)
+      if (!frame) {
+        throw new Error('pas de frame trouvé')
+      }
+
+      res.status(200).json({
+        frame: frame,
+        message: 'Frame trouvé',
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(501).json(error)
+  }
+}
+
+const getOneFrame = async (req, res) => {
+  const { id } = req.params
+  try {
+    let frame = {}
+    const filter = {}
+    if (id) {
+      filter.id = id
+      frame = await getSingleFrame(Frame, filter)
+      if (!frame) {
+        throw new Error('pas de frame trouvé')
+      }
+
+      res.status(200).json({
+        frame: frame,
+        message: 'Frame trouvé',
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(501).json(error)
+  }
+}
+
 const createFanFram = async (req, res) => {
-  const { imgUrl, frameId } = req.body
+  const { imgUrl, frameUrl } = req.body
 
   // console.log('url', imgUrl, frameUrl)
 
-  const result = await poseFrame(imgUrl, frameId, Frame)
+  const result = await poseFrame(imgUrl, frameUrl)
   res.status(200).json({
     frames: result,
   })
 }
 
-module.exports = { getAllFrames, createFrame, createFanFram }
+module.exports = { getAllFrames, createFrame, createFanFram, getOneFrame }

@@ -59,6 +59,26 @@ const getFramelist = async (Frame, filter) => {
   }
 }
 
+const getSingleFrame = async (Frame, filter) => {
+  try {
+    const frame = await Frame.findOne({
+      _id: { $eq: filter.id },
+    })
+    if (!frame) {
+      throw new Error('Aucun frame trouvé')
+    }
+    return {
+      frame: frame,
+      error: null,
+    }
+  } catch (error) {
+    return {
+      frames: {},
+      error: error.message,
+    }
+  }
+}
+
 const uploadFile = async (file, precept) => {
   try {
     const formdata = new FormData()
@@ -75,17 +95,12 @@ const uploadFile = async (file, precept) => {
   }
 }
 
-const poseFrame = async (imageUrl, frameId, frameEntity) => {
+const poseFrame = async (imageUrl, frameUrl) => {
   // Récupérer l'image et le frame à partir des URL
   try {
-    const frameUrl = await frameEntity.findOne({ _id: frameId })
-    console.log(frameUrl)
-    if (!frameUrl.imgUrl) {
-      throw new Error('Le frame est introuvable')
-    }
     const [image, frame] = await Promise.all([
       loadImage(imageUrl),
-      loadImage(frameUrl.imgUrl),
+      loadImage(frameUrl),
     ])
 
     // Créer un canevas de la taille de l'image
@@ -117,4 +132,4 @@ const poseFrame = async (imageUrl, frameId, frameEntity) => {
     console.log('err', error)
   }
 }
-module.exports = { insertFrame, getFramelist, poseFrame }
+module.exports = { insertFrame, getFramelist, poseFrame, getSingleFrame }
