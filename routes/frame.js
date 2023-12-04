@@ -1,9 +1,9 @@
 const express = require('express')
 const {
-    createFrame,
-    getAllFrames,
-    createFanFram,
-    getOneFrame
+  createFrame,
+  getAllFrames,
+  createFanFram,
+  getOneFrame,
 } = require('../controllers/frame')
 const router = express.Router()
 

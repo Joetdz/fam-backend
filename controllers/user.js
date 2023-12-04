@@ -22,7 +22,7 @@ const createOrLoginUser = async (req, res) => {
     }
 
     const token = jwt.encode(playload, config.jwtSecret)
-    res.status(200).json({
+    res.status(($ = $ = 200)).json({
       userId: user,
       token: `Bearer ${token}`,
     })
