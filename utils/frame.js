@@ -75,12 +75,17 @@ const uploadFile = async (file, precept) => {
   }
 }
 
-const poseFrame = async (imageUrl, frameUrl) => {
+const poseFrame = async (imageUrl, frameId, frameEntity) => {
   // Récupérer l'image et le frame à partir des URL
   try {
+    const frameUrl = await frameEntity.findOne({ _id: frameId })
+    console.log(frameUrl)
+    if (!frameUrl.imgUrl) {
+      throw new Error('Le frame est introuvable')
+    }
     const [image, frame] = await Promise.all([
       loadImage(imageUrl),
-      loadImage(frameUrl),
+      loadImage(frameUrl.imgUrl),
     ])
 
     // Créer un canevas de la taille de l'image

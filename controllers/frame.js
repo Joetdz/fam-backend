@@ -65,11 +65,11 @@ const getAllFrames = async (req, res) => {
 }
 
 const createFanFram = async (req, res) => {
-  const { imgUrl, frameUrl } = req.body
+  const { imgUrl, frameId } = req.body
 
   // console.log('url', imgUrl, frameUrl)
 
-  const result = await poseFrame(imgUrl, frameUrl)
+  const result = await poseFrame(imgUrl, frameId, Frame)
   res.status(200).json({
     frames: result,
   })
