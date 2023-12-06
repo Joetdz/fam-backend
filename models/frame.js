@@ -24,6 +24,9 @@ const frameSchema = new Schema({
   usedBy: {
     type: Array,
   },
+  abonment: {
+    type: String,
+  },
 })
 
 frameSchema.plugin(uniqueValidator)
