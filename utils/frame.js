@@ -1,17 +1,24 @@
 const axios = require('axios')
 const { createCanvas, loadImage } = require('canvas')
 
+async function checkAvailability(arr, val) {
+  return arr.some((arrVal) => val === arrVal)
+}
+
 const insertFrame = async (frame, Frame, User) => {
   try {
     const userCheck = await User.findOne({
       facebookId: frame.createdBy,
     })
+    const checkAbonnement = await checkAvailability(
+      userCheck.abonnements,
+      abonnement.id
+    )
     if (!userCheck) {
       throw new Error('Utilisateur introuvable')
+    } else if (userCheck.abonnement <= 0) {
+      throw new Error('Vous  n avez plus d abonnement pour creer ce frame')
     }
-    // } else if (userCheck.abonnement <= 0) {
-    //   throw new Error('Vous  n avez plus d abonnement pour creer ce frame')
-    // }
 
     let newFrame = null
     newFrame = await Frame.create(frame)
@@ -102,7 +109,7 @@ const uploadFile = async (file, precept) => {
     return null
   }
 }
- 
+
 const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
   // Récupérer l'image et le frame à partir des URL
   try {
@@ -167,6 +174,5 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
     return { finalImageUrl: null, error: error.message }
   }
 }
-
 
 module.exports = { insertFrame, getFramelist, poseFrame, getSingleFrame }

@@ -8,7 +8,7 @@ const saveAbonnement = async (userId, userEntity, myPayement) => {
     }
 
     const savePayement = await userEntity.update(
-      { facebookId: userId },
+      { _id: { $eq: userId } },
       { $push: { abonnements: myPayement } }
     )
     if (!savePayement) {
