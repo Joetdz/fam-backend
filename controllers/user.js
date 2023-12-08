@@ -1,5 +1,5 @@
 const { User } = require('../models/user')
-const signupOrsignin = require('../utils/user')
+const { signupOrsignin } = require('../utils/user')
 const jwt = require('jwt-simple')
 const config = require('../config/config')
 
@@ -22,8 +22,8 @@ const createOrLoginUser = async (req, res) => {
     }
 
     const token = jwt.encode(playload, config.jwtSecret)
-    res.status(($ = $ = 200)).json({
-      userId: user,
+    res.status(200).json({
+      userId: newUser.user,
       token: `Bearer ${token}`,
     })
   } catch (error) {
