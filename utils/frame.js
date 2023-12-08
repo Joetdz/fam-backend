@@ -102,7 +102,7 @@ const uploadFile = async (file, precept) => {
     return null
   }
 }
-
+ 
 const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
   // Récupérer l'image et le frame à partir des URL
   try {
@@ -114,7 +114,7 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
       throw new Error('Frame introuvable')
     }
 
-    if (frameExist.usedBy.length < frameExist.maxUser) {
+    if (frameExist.usedBy.length >= frameExist.maxUser) {
       throw new Error(
         "La limite d'utilisation pour ce frame est déjà atteinte "
       )
@@ -167,4 +167,6 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
     return { finalImageUrl: null, error: error.message }
   }
 }
+
+
 module.exports = { insertFrame, getFramelist, poseFrame, getSingleFrame }

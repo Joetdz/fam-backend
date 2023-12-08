@@ -14,9 +14,9 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  abonnement: {
-    type: Number,
-    default: 0,
+  abonnements: {
+    type: Array,
+    default: [{ id: '', planName: '', maxUser: '', statut: '', date: '' }],
   },
 })
 
