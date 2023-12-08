@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const uniqueValidator = require('mongoose-unique-validator')
+// { id: '', planName: '', maxUser: '', statut: '', date: '' }
 
 const userSchema = new Schema({
   name: {
@@ -16,7 +17,7 @@ const userSchema = new Schema({
   },
   abonnements: {
     type: Array,
-    default: [{ id: '', planName: '', maxUser: '', statut: '', date: '' }],
+    default: [],
   },
 }, { timestamps: true })
 
