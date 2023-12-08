@@ -114,6 +114,12 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
       throw new Error('Frame introuvable')
     }
 
+    if (frameExist.usedBy.length < frameExist.maxUser) {
+      throw new Error(
+        "La limite d'utilisation pour ce frame est déjà atteinte "
+      )
+    }
+
     const frame = await loadImage(frameExist.imgUrl)
 
     const image = await loadImage(imageUrl)
@@ -145,7 +151,7 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
     }
     const addUserInUsedFrame = await frameEntity.update(
       { _id: { $eq: frameId } },
-      { $push: { usedBy: userId } }
+      { $push: { usedBy: userId }, maxUser: 15 }
     )
     if (!addUserInUsedFrame) {
       throw new Error(
@@ -157,7 +163,8 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
       error: null,
     }
   } catch (error) {
-    return { finalImageUrl: null, error: error }
+    console.log(error)
+    return { finalImageUrl: null, error: error.message }
   }
 }
 module.exports = { insertFrame, getFramelist, poseFrame, getSingleFrame }
