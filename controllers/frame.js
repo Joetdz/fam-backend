@@ -31,7 +31,7 @@ const createFrame = async (req, res) => {
 }
 
 const getAllFrames = async (req, res) => {
-  const { createdBy, query } = req.query
+  const { createdBy, query, page, limit } = req.query
   console.log('createdBy', createdBy)
   try {
     let allFrames = []
@@ -58,7 +58,22 @@ const getAllFrames = async (req, res) => {
         frames: allFrames.frames,
         messega: 'Tous les frames recupérés avec succès ft',
       })
-    } else {
+    } else if (page && limit) {
+      filter.page = page;
+      filter.limit = limit
+
+      allFrames = await getFramelist(Frame, filter)
+      if (allFrames && allFrames.frames.length == 0) {
+        throw new Error('Pas de frame disponible')
+      }
+
+      res.status(200).json({
+        frames: allFrames.frames,
+        messega: 'Tous les frames recupérés avec succès',
+      })
+    }    
+    
+    else {
       allFrames = await getFramelist(Frame)
       if (!allFrames) {
         throw new Error('pas de frames crée par cet utilisateur')

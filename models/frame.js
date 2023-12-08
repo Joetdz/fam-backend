@@ -30,8 +30,8 @@ const frameSchema = new Schema({
   maxUser: {
     type: Number,
     default: 15,
-  },
-})
+  }
+}, { timestamps: true })
 
 frameSchema.plugin(uniqueValidator)
 const Frame = mongoose.model('frame', frameSchema)
