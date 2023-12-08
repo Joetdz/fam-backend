@@ -103,7 +103,7 @@ const uploadFile = async (file, precept) => {
   }
 }
 
-const poseFrame = async (imageUrl, frameId, frameEntity) => {
+const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
   // Récupérer l'image et le frame à partir des URL
   try {
     const frameExist = await frameEntity.findOne({
@@ -143,12 +143,21 @@ const poseFrame = async (imageUrl, frameId, frameEntity) => {
     if (!finalImageUrl) {
       throw new Error("Impossible d'envoyer L'image à cloudinary")
     }
-
+    const addUserInUsedFrame = await frameEntity.update(
+      { _id: { $eq: frameId } },
+      { $push: { usedBy: userId } }
+    )
+    if (!addUserInUsedFrame) {
+      throw new Error(
+        "impossible d'ajouter le user dans la liste des users du frame"
+      )
+    }
     return {
       finalImageUrl: finalImageUrl,
+      error: null,
     }
   } catch (error) {
-    return error
+    return { finalImageUrl: null, error: error }
   }
 }
 module.exports = { insertFrame, getFramelist, poseFrame, getSingleFrame }
