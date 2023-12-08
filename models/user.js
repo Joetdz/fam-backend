@@ -19,7 +19,7 @@ const userSchema = new Schema({
     type: Array,
     default: [],
   },
-})
+}, { timestamps: true })
 
 userSchema.plugin(uniqueValidator)
 const User = mongoose.model('user', userSchema)

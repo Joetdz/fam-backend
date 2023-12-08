@@ -1,5 +1,5 @@
 const { User } = require('../models/user')
-const { signupOrsignin } = require('../utils/user')
+const { signupOrsignin, getSingleUser, getUserList } = require('../utils/user')
 const jwt = require('jwt-simple')
 const config = require('../config/config')
 
@@ -31,4 +31,49 @@ const createOrLoginUser = async (req, res) => {
     res.status(403).json(error.massage)
   }
 }
-module.exports = { createOrLoginUser }
+
+const getAllUsers = async (req, res) => {
+  try {
+    let allUsers = []
+  
+    allUsers = await getUserList(User)
+    if (!allUsers) {
+      throw new Error('pas de utilisateurs trouvés')
+      }
+
+      res.status(200).json({
+        users: allUsers,
+        messega: 'Tous les utilisateurs recupérés avec succès ',
+      })
+    }
+   catch (error) {
+    console.log(error)
+    res.status(501).json(error)
+  }
+}
+
+
+const getOneUser = async (req, res) => {
+  const { id } = req.params
+  try {
+    let user = {}
+    const filter = {}
+    if (id) {
+      filter.id = id
+      user = await getSingleUser(User, filter)
+      if (!user) {
+        throw new Error("Pas d'utilisateur trouvé")
+      }
+
+      res.status(200).json({
+        frame: user,
+        message: 'Utilisateur trouvé',
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(501).json(error)
+  }
+}
+
+module.exports = { createOrLoginUser, getOneUser, getAllUsers }
