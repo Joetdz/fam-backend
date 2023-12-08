@@ -99,14 +99,18 @@ const getOneFrame = async (req, res) => {
 }
 
 const createFanFram = async (req, res) => {
-  const { imgUrl, frameId } = req.body
+  const { imgUrl, frameId, userId } = req.body
 
   // console.log('url', imgUrl, frameUrl)
-
-  const result = await poseFrame(imgUrl, frameId, Frame)
-  res.status(200).json({
-    frames: result,
-  })
+  try {
+    const result = await poseFrame(imgUrl, frameId, userId, Frame)
+    res.status(200).json({
+      frames: result,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(501).json(error)
+  }
 }
 
 module.exports = { getAllFrames, createFrame, createFanFram, getOneFrame }

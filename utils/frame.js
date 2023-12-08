@@ -1,17 +1,24 @@
 const axios = require('axios')
 const { createCanvas, loadImage } = require('canvas')
 
+async function checkAvailability(arr, val) {
+  return arr.some((arrVal) => val === arrVal)
+}
+
 const insertFrame = async (frame, Frame, User) => {
   try {
     const userCheck = await User.findOne({
       facebookId: frame.createdBy,
     })
+    const checkAbonnement = await checkAvailability(
+      userCheck.abonnements,
+      abonnement.id
+    )
     if (!userCheck) {
       throw new Error('Utilisateur introuvable')
+    } else if (userCheck.abonnement <= 0) {
+      throw new Error('Vous  n avez plus d abonnement pour creer ce frame')
     }
-    // } else if (userCheck.abonnement <= 0) {
-    //   throw new Error('Vous  n avez plus d abonnement pour creer ce frame')
-    // }
 
     let newFrame = null
     newFrame = await Frame.create(frame)
@@ -103,7 +110,7 @@ const uploadFile = async (file, precept) => {
   }
 }
 
-const poseFrame = async (imageUrl, frameId, frameEntity) => {
+const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
   // Récupérer l'image et le frame à partir des URL
   try {
     const frameExist = await frameEntity.findOne({
@@ -112,6 +119,12 @@ const poseFrame = async (imageUrl, frameId, frameEntity) => {
 
     if (!frameExist) {
       throw new Error('Frame introuvable')
+    }
+
+    if (frameExist.usedBy.length >= frameExist.maxUser) {
+      throw new Error(
+        "La limite d'utilisation pour ce frame est déjà atteinte "
+      )
     }
 
     const frame = await loadImage(frameExist.imgUrl)
@@ -143,12 +156,23 @@ const poseFrame = async (imageUrl, frameId, frameEntity) => {
     if (!finalImageUrl) {
       throw new Error("Impossible d'envoyer L'image à cloudinary")
     }
-
+    const addUserInUsedFrame = await frameEntity.update(
+      { _id: { $eq: frameId } },
+      { $push: { usedBy: userId }, maxUser: 15 }
+    )
+    if (!addUserInUsedFrame) {
+      throw new Error(
+        "impossible d'ajouter le user dans la liste des users du frame"
+      )
+    }
     return {
       finalImageUrl: finalImageUrl,
+      error: null,
     }
   } catch (error) {
-    return error
+    console.log(error)
+    return { finalImageUrl: null, error: error.message }
   }
 }
+
 module.exports = { insertFrame, getFramelist, poseFrame, getSingleFrame }

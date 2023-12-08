@@ -24,6 +24,13 @@ const frameSchema = new Schema({
   usedBy: {
     type: Array,
   },
+  abonment: {
+    type: String,
+  },
+  maxUser: {
+    type: Number,
+    default: 15,
+  },
 })
 
 frameSchema.plugin(uniqueValidator)
