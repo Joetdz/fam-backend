@@ -18,7 +18,7 @@ const userSchema = new Schema({
     type: Array,
     default: [{ id: '', planName: '', maxUser: '', statut: '', date: '' }],
   },
-})
+}, { timestamps: true })
 
 userSchema.plugin(uniqueValidator)
 const User = mongoose.model('user', userSchema)
