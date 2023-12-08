@@ -22,7 +22,7 @@ const saveAbonnement = async (userId, userEntity, myPayement) => {
   } catch (error) {
     return {
       sucessPayment: null,
-      error: error.message,
+      error: error,
     }
   }
 }
