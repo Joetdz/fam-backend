@@ -18,18 +18,20 @@ const frameSchema = new Schema({
     type: String,
     required: true,
   },
-  like: {
-    type: Number,
+  likes: {
+    type: [String],
+    default: [],
   },
   usedBy: {
-    type: Array,
+    type: [String],
+    default: []
   },
   abonment: {
     type: String,
+    required: true
   },
-  maxUser: {
-    type: Number,
-    default: 15,
+  planId: {
+    type: String,
   }
 }, { timestamps: true })
 

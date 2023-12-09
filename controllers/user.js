@@ -53,7 +53,7 @@ const getAllUsers = async (req, res) => {
 
 const getOneUser = async (req, res) => {
   const { id } = req.params
-  if (!id) return res.status(301).json({ message: 'You must provide an id' })
+  if (!id) return res.status(400).json({ message: 'You must provide an id' })
   try {
     const user = await User.findById(id)
     return res.json(user)
