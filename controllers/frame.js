@@ -1,32 +1,34 @@
-const { User } = require('../models/user')
 const { Frame } = require('..//models/frame')
 const {
-  insertFrame,
   getFramelist,
   poseFrame,
   getSingleFrame,
 } = require('../utils/frame')
+const { usePlan } = require('../utils/user')
 
 const createFrame = async (req, res) => {
-  const frame = req.body
+  const { createdBy, name, description, imgUrl, planId } = req.body
+  if (!createdBy || !name || !imgUrl)
+    return res.status(400).json({
+      message: 'You must provide name, planId, imgUrl and createdBy',
+    })
   try {
-    if (!frame.name && !frame.createdBy) {
-      throw new Error(
-        'Imposible de créer le frame sans le nom et sans être membre'
-      )
-    }
-    let newFrame = null
-    newFrame = await insertFrame(frame, Frame, User)
-    if (!newFrame.frame) {
-      throw new Error(newFrame.error)
-    }
-    res.status(200).json({
-      frame: newFrame.frame,
-      message: `Le frame a été  créé avec succès`,
+    // Check if user has the selected plan and use it
+    const abonmentId = await usePlan(createdBy, planId)
+    if (!abonmentId) return res.status(401)
+    const newFrame = await Frame.create({
+      createdBy,
+      name,
+      imgUrl,
+      description,
+      planId: abonmentId
+    })
+    return res.status(200).json({
+      frame: newFrame,
     })
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({ error })
+    console.log(error)
+    res.status(500).json({ message: 'Something went wrong' })
   }
 }
 
@@ -59,7 +61,7 @@ const getAllFrames = async (req, res) => {
         messega: 'Tous les frames recupérés avec succès ft',
       })
     } else if (page && limit) {
-      filter.page = page;
+      filter.page = page
       filter.limit = limit
 
       allFrames = await getFramelist(Frame, filter)
@@ -71,9 +73,7 @@ const getAllFrames = async (req, res) => {
         frames: allFrames.frames,
         messega: 'Tous les frames recupérés avec succès',
       })
-    }    
-    
-    else {
+    } else {
       allFrames = await getFramelist(Frame)
       if (!allFrames) {
         throw new Error('pas de frames crée par cet utilisateur')
