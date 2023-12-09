@@ -2,10 +2,10 @@ const axios = require('axios')
 const { createCanvas, loadImage } = require('canvas')
 
 async function checkAvailability(arr, val) {
-    return arr.some((arrVal) => val === arrVal)
+    return val ? arr.find((arrVal) => val === arrVal) : "Free"
 }
 
-const insertFrame = async (frame, Frame, User) => {
+const insertFrame = async (frame, Frame, User, abonnement) => {
     try {
         const userCheck = await User.findOne({
             facebookId: frame.createdBy,
@@ -14,6 +14,9 @@ const insertFrame = async (frame, Frame, User) => {
             userCheck.abonnements,
             abonnement.id
         )
+
+        
+
         if (!userCheck) {
             throw new Error('Utilisateur introuvable')
         } else if (userCheck.abonnement <= 0) {
@@ -21,8 +24,18 @@ const insertFrame = async (frame, Frame, User) => {
         }
 
         let newFrame = null
-        newFrame = await Frame.create(frame)
-        const userUpdate = await User.update({ facebookId: frame.createdBy }, { $push: { frames: newFrame.name }, abonnement: userCheck.abonnement - 1 })
+        let userUpdate = {} 
+
+        if (checkAbonnement === "Free") {
+            newFrame = await Frame.create(frame)
+            userUpdate = await User.update({ facebookId: frame.createdBy }, { $push: { frames: newFrame.name }, abonnement: "Free" })
+        } else if (!checkAbonnement || checkAbonnement.length <= 0) {
+            throw new Error("Vous  n'avez pas d'abonnement pour creer ce frame, veuillez passer à la formule supérieure")
+        } else {
+            newFrame = await Frame.create(frame)
+            userUpdate = await User.update({ facebookId: frame.createdBy }, { $push: { frames: newFrame.name }, abonnement: userCheck.abonnement - 1 })
+        }
+        
         if (!userUpdate) {
             throw new Error(
                 'Quelque chose s est mal passée lors de l attribution de la propriéte de ce frame '
@@ -39,7 +52,7 @@ const insertFrame = async (frame, Frame, User) => {
         }
     }
 }
-const getFramelist = async (Frame, filter) => { 
+const getFramelist = async (Frame, filter) => {
 
     try {
         const frames =
