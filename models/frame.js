@@ -26,10 +26,6 @@ const frameSchema = new Schema({
     type: [String],
     default: []
   },
-  abonment: {
-    type: String,
-    required: true
-  },
   planId: {
     type: String,
   }

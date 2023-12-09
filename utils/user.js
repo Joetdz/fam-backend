@@ -1,5 +1,5 @@
 const { User } = require('../models/user')
-const uid = require('uid')
+const { uid } = require('uid')
 
 const signupOrsignin = async (user, User) => {
   try {
