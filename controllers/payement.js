@@ -1,5 +1,6 @@
 const { User } = require('../models/user')
 const { saveAbonnement } = require('../utils/payement')
+const { transporter } = require('../services/email')
 
 const buyAbonnement = async (req, res) => {
   const { myPayement, userId } = req.body
@@ -28,5 +29,30 @@ const buyAbonnement = async (req, res) => {
     })
   }
 }
-
-module.exports = { buyAbonnement }
+const sendMail = async (req, res) => {
+  const { from, to, subject, text, html } = req.body
+  try {
+    if (!from || !to || !subject || !text) {
+      throw new Error(
+        "Vous devez fournir le destinateire , l'obejt , et le corp du mail"
+      )
+    }
+    const mailOptions = {
+      from,
+      to,
+      subject,
+      text,
+      html,
+    }
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        res.status(500).json({ error: err })
+      } else {
+        res.status(200).json({ success: true, info: info })
+      }
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+module.exports = { buyAbonnement, sendMail }
