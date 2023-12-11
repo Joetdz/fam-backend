@@ -30,9 +30,10 @@ const buyAbonnement = async (req, res) => {
   }
 }
 const sendMail = async (req, res) => {
-  const { from, to, subject, text, html } = req.body
+  const { to, subject, text, html } = req.body
+  const from = `${process.env.EMAIL_FROM}`
   try {
-    if (!from || !to || !subject || !text) {
+    if (!to || !subject || !text) {
       throw new Error(
         "Vous devez fournir le destinateire , l'obejt , et le corp du mail"
       )
