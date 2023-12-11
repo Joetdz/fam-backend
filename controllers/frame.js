@@ -3,6 +3,7 @@ const {
   getFramelist,
   poseFrame,
   getSingleFrame,
+  deleteFrame,
 } = require('../utils/frame')
 const { usePlan } = require('../utils/user')
 
@@ -21,7 +22,7 @@ const createFrame = async (req, res) => {
       name,
       imgUrl,
       description,
-      planId: abonmentId
+      planId: abonmentId,
     })
     return res.status(200).json({
       frame: newFrame,
@@ -97,7 +98,30 @@ const getOneFrame = async (req, res) => {
     const filter = {}
     if (id) {
       filter.id = id
-      frame = await getSingleFrame(Frame, filter)
+      frame = await deleteFrame(Frame, filter)
+      if (!frame) {
+        throw new Error('pas de frame trouvé')
+      }
+
+      res.status(200).json({
+        frame: frame,
+        message: 'Frame supprimé avec succes',
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(501).json(error)
+  }
+}
+
+const deleteOneFrame = async (req, res) => {
+  const { id } = req.params
+  try {
+    let frame = {}
+    const filter = {}
+    if (id) {
+      filter.id = id
+      frame = await deleteFrame(Frame, filter)
       if (!frame) {
         throw new Error('pas de frame trouvé')
       }
@@ -128,4 +152,10 @@ const createFanFram = async (req, res) => {
   }
 }
 
-module.exports = { getAllFrames, createFrame, createFanFram, getOneFrame }
+module.exports = {
+  getAllFrames,
+  createFrame,
+  createFanFram,
+  getOneFrame,
+  deleteOneFrame,
+}
