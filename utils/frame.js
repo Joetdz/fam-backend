@@ -65,19 +65,28 @@ const getFramelist = async (Frame, filter) => {
   try {
     const frames =
       filter && filter.createdBy && !filter.query
-        ? await Frame.find({ createdBy: { $eq: filter.createdBy } })
+        ? await Frame.find({
+            createdBy: { $eq: filter.createdBy },
+            deleted: false,
+          })
         : filter && filter.query
           ? await Frame.find({
               $or: [
-                { name: { $regex: new RegExp(filter.query, 'i') } },
-                { description: { $regex: new RegExp(filter.query, 'i') } },
+                {
+                  name: { $regex: new RegExp(filter.query, 'i') },
+                  deleted: false,
+                },
+                {
+                  description: { $regex: new RegExp(filter.query, 'i') },
+                  deleted: false,
+                },
               ],
             })
           : filter && filter.page && filter.limit
-            ? await Frame.find()
+            ? await Frame.find({ deleted: false })
                 .limit(filter.limit * 1)
                 .skip((filter.page - 1) * filter.limit)
-            : await Frame.find()
+            : await Frame.find({ deleted: false })
 
     if (!frames || frames.length === 0) {
       throw new Error('Aucun frame trouvé')
