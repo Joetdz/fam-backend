@@ -115,6 +115,25 @@ const getSingleFrame = async (Frame, filter) => {
     }
   }
 }
+const deleteFrame = async (Frame, filter) => {
+  try {
+    const frame = await Frame.findByIdAndDelete({
+      _id: filter.id,
+    })
+    if (!frame) {
+      throw new Error('Aucun frame trouvé')
+    }
+    return {
+      frame: frame,
+      error: null,
+    }
+  } catch (error) {
+    return {
+      frames: {},
+      error: error.message,
+    }
+  }
+}
 
 const uploadFile = async (file, precept) => {
   try {
@@ -200,4 +219,10 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
   }
 }
 
-module.exports = { insertFrame, getFramelist, poseFrame, getSingleFrame }
+module.exports = {
+  insertFrame,
+  getFramelist,
+  poseFrame,
+  getSingleFrame,
+  deleteFrame,
+}
