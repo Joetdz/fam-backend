@@ -94,11 +94,11 @@ const getOneFrame = async (req, res) => {
   const { id } = req.params
   try {
     const frame = await Frame.findById(id)
-    return {
+    return res.json({
       frame: {
         frame
       }
-    }
+    })
   } catch (error) {
     console.log(error)
     res.status(501).json(error)
@@ -108,11 +108,10 @@ const getOneFrame = async (req, res) => {
 const deleteOneFrame = async (req, res) => {
   const { id } = req.params
   try {
-    let frame = {}
     const filter = {}
     if (id) {
       filter.id = id
-      frame = await deleteFrame(Frame, filter)
+      await deleteFrame(Frame, filter)
       res.status(201).json({success: true})
     }
   } catch (error) {
