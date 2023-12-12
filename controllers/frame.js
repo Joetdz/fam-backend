@@ -98,7 +98,7 @@ const getOneFrame = async (req, res) => {
     const filter = {}
     if (id) {
       filter.id = id
-      frame = await deleteFrame(Frame, filter)
+      frame = await getSingleFrame(Frame, filter)
       if (!frame) {
         throw new Error('pas de frame trouvé')
       }
