@@ -2,8 +2,7 @@ const { Frame } = require('..//models/frame')
 const {
   getFramelist,
   poseFrame,
-  getSingleFrame,
-  deleteFrame,
+  deleteFrame
 } = require('../utils/frame')
 const { usePlan } = require('../utils/user')
 
@@ -94,19 +93,11 @@ const getAllFrames = async (req, res) => {
 const getOneFrame = async (req, res) => {
   const { id } = req.params
   try {
-    let frame = {}
-    const filter = {}
-    if (id) {
-      filter.id = id
-      frame = await deleteFrame(Frame, filter)
-      if (!frame) {
-        throw new Error('pas de frame trouvé')
+    const frame = await Frame.findById(id)
+    return {
+      frame: {
+        frame
       }
-
-      res.status(200).json({
-        frame: frame,
-        message: 'Frame supprimé avec succes',
-      })
     }
   } catch (error) {
     console.log(error)
@@ -122,14 +113,7 @@ const deleteOneFrame = async (req, res) => {
     if (id) {
       filter.id = id
       frame = await deleteFrame(Frame, filter)
-      if (!frame) {
-        throw new Error('pas de frame trouvé')
-      }
-
-      res.status(200).json({
-        frame: frame,
-        message: 'Frame trouvé',
-      })
+      res.status(201).json({success: true})
     }
   } catch (error) {
     console.log(error)
