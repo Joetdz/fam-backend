@@ -3,23 +3,30 @@ const Schema = mongoose.Schema
 const uniqueValidator = require('mongoose-unique-validator')
 // { id: '', planName: '', maxUser: '', statut: '', date: '' }
 
-const userSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
+const userSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    frames: {
+      type: Array,
+    },
+    facebookId: {
+      type: String,
+      required: true,
+    },
+    abonnements: {
+      type: Array,
+      default: [],
+    },
   },
-  frames: {
-    type: Array,
-  },
-  facebookId: {
-    type: String,
-    required: true,
-  },
-  abonnements: {
-    type: Array,
-    default: [],
-  },
-}, { timestamps: true })
+  { timestamps: true }
+)
 
 userSchema.plugin(uniqueValidator)
 const User = mongoose.model('user', userSchema)
