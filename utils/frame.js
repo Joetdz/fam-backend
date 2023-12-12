@@ -117,11 +117,17 @@ const getSingleFrame = async (Frame, filter) => {
 }
 const deleteFrame = async (Frame, filter) => {
   try {
-    const frame = await Frame.findByIdAndDelete({
-      _id: filter.id,
-    })
-    if (!frame) {
-      throw new Error('Aucun frame trouvé')
+    const frame = await Frame.update(
+      {
+        _id: { $eq: filter.id },
+      },
+      {
+        deleted: true,
+        description: 'yes',
+      }
+    )
+    if (frame.modifiedCount === 0) {
+      throw new Error("La frame n'est pas supprimée")
     }
     return {
       frame: frame,
