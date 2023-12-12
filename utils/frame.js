@@ -41,7 +41,6 @@ const insertFrame = async (frame, Frame, User, abonnement) => {
         { facebookId: frame.createdBy },
         {
           $push: { frames: newFrame.name },
-          abonnement: userCheck.abonnement - 1,
         }
       )
     }
