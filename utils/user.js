@@ -86,7 +86,7 @@ const usePlan = async (userId, planId) => {
       return id
     }
     const selectedPlan = user.abonnements.find((abo) => abo.id == planId)
-    if (!selectedPlan || selectedPlan?.used) return null
+    if (!selectedPlan) return null
     const abonnements = user.abonnements.map((abo) =>
       abo.id != planId ? abo : { ...abo, used: true }
     )

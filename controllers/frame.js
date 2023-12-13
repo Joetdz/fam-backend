@@ -17,6 +17,7 @@ const createFrame = async (req, res) => {
     // Check if user has the selected plan and use it
     const abonmentId = await usePlan(createdBy, planId)
     if (!abonmentId) return res.status(401)
+
     const newFrame = await Frame.create({
       createdBy,
       name,
