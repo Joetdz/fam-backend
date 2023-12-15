@@ -99,7 +99,9 @@ const usePlan = async (userId, planId) => {
 }
 const checkPlan = async (userId, planId) => {
   try {
-    const user = await User.findById(userId)
+    const user = await User.findOne({
+      _id: { $eq: userId },
+    })
     if (!user) throw new Error('Aucun utilisateur trouvé avec cette id')
     if (!planId) throw new Error("Vous n'avez pas selecetionner une plan ")
     const selectedPlan = user.abonnements.find((abo) => abo.id == planId)
