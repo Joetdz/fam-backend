@@ -5,7 +5,7 @@ const {
   getSingleFrame,
   deleteFrame,
 } = require('../utils/frame')
-const { usePlan } = require('../utils/user')
+const { usePlan, changePlan } = require('../utils/user')
 
 const createFrame = async (req, res) => {
   const { createdBy, name, description, imgUrl, planId } = req.body
@@ -31,6 +31,30 @@ const createFrame = async (req, res) => {
   } catch (error) {
     console.log(error)
     res.status(500).json({ message: 'Something went wrong' })
+  }
+}
+
+const upGradeFramPlan = async (req, res) => {
+  const { frameId, planId, createdBy } = req.body
+  try {
+    if (!frameId | !planId | createdBy)
+      throw new Error('Vous devez fournir frameId , planId et createdBy')
+
+    const abonmentId = await usePlan(createdBy, planId)
+    if (!abonmentId) return res.status(401)
+    const updateFramePlan = await Frame.updateOne(
+      {
+        planId: abonmentId,
+      },
+      { planId: abonmentId }
+    )
+
+    if (!updateFramePlan.modifiedCount === 0)
+      throw new Error('Le changement de plan n est pas passé ')
+    return res.status(200).json({ message: 'Plan changer avec succès ' })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: error.message })
   }
 }
 
@@ -159,4 +183,5 @@ module.exports = {
   createFanFram,
   getOneFrame,
   deleteOneFrame,
+  upGradeFramPlan,
 }

@@ -29,9 +29,9 @@ const saveAbonnement = async (userId, userEntity, myPayement) => {
   <li>Plan : <strong style="color: black;">${planName}</strong></li>
   <li>Durée : <strong style="color: black;">1 mois</strong></li>
   <li>Prix : <strong><span style="color: black;">$${
-    (planName === 'Basic' && '9') ||
-    (planName === 'Standard' && '29') ||
-    (planName === 'Premium' && '99')
+    (planName === 'Basic' && '9$') ||
+    (planName === 'Standard' && '29$') ||
+    (planName === 'Premium' && '99$')
   }</span></strong></li>
 </ul>  <p style="color: black;">Votre abonnement est désormais actif. Profitez pleinement de votre expérience sur FanFrame.co.
 Si vous avez des questions, n’hésitez pas à nous contacter à ${
