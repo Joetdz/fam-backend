@@ -1,4 +1,6 @@
 const { Frame } = require('..//models/frame')
+const { User } = require('../models/user')
+const { sendCreateFrameMail } = require('../services/email')
 const {
   getFramelist,
   poseFrame,
@@ -25,6 +27,10 @@ const createFrame = async (req, res) => {
       description,
       planId: abonmentId,
     })
+    const user = await User.findById(createdBy)
+    if (user && user.email) {
+      sendCreateFrameMail(user)
+    }
     return res.status(200).json({
       frame: newFrame,
     })
