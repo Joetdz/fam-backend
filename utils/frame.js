@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { createCanvas, loadImage } = require('canvas')
 const { User } = require('../models/user')
+const { sendPlanFansExpiryMail } = require('../services/email')
 
 async function checkAvailability(arr, val) {
   return val ? arr.find((arrVal) => val === arrVal) : 'Free'
@@ -183,6 +184,11 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
     const plan = user.abonnements.find((abo) => abo.id == frameExist.planId)
     if (frameExist.usedBy.length >= plan.maxUser) {
       throw new Error('Utilisations depassées')
+    }
+
+    const remaining = plan.maxUser - frameExist.usedBy.length
+    if(remaining <= 5){
+      sendPlanFansExpiryMail(user, remaining)
     }
 
     const frame = await loadImage(frameExist.imgUrl)

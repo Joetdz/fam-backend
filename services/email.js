@@ -4,7 +4,7 @@ require('dotenv').config()
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_USE_SSL == "true",
+  // secure: process.env.SMTP_USE_SSL == "true",
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
 
 const sendCreateFrameMail = async (user) => {
   if (!user.email) return
-  console.log(transporter.options)
   transporter.sendMail(
     {
       from: '"FanFrame" <infos.fanframe.co>',
@@ -79,4 +78,62 @@ const sendCreateFrameMail = async (user) => {
   )
 }
 
-module.exports = { transporter, sendCreateFrameMail }
+const sendPlanFansExpiryMail = async (user, remaining) => {
+  if (!user.email) return
+  transporter.sendMail(
+    {
+      from: '"FanFrame" <infos.fanframe.co>',
+      to: user.email,
+      subject: 'Mise à jour de votre frame pour atteindre plus de fans',
+      html: `
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Enregistrement de votre frame</title>
+    </head>
+    <body>
+      <table>
+        <tbody>
+          <tr>
+            <td>Cher ${user.name},</td>
+          </tr>
+          <tr>
+            <td><br></td>
+          </tr>
+          <tr>
+            <td>
+              Nous tenons à vous informer que votre frame sur notre plateforme est en train de rencontrer un franc succès et qu'elle approche bientôt du nombre maximum d'utilisations autorisées. Actuellement, il ne reste que ${remaining} utilisations disponibles pour votre frame.
+            </td>
+          </tr>
+          <tr>
+            <td>
+            <br />
+            Si vous souhaitez continuer à permettre à vos fans d'utiliser votre frame et d'étendre votre visibilité, nous vous encourageons à envisager de passer à notre plan premium, qui vous offrira un nombre illimité d'utilisations pour vos frames, ainsi que d'autres fonctionnalités exclusives pour interagir avec votre communauté.</td>
+          </tr>
+          <tr>
+            <td>
+              <br>
+              Une question? Une préoccupation? N'hésitez pas à répondre à ce mail.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <br>
+              Cordialement, l'équipe <a style="text-decoration: none;" href="https://fanframe.co">fanframe.co</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </body>
+    </html>
+    `,
+    },
+    (error) => {
+      if (error) console.log(error)
+    }
+  )
+}
+
+module.exports = { transporter, sendCreateFrameMail, sendPlanFansExpiryMail }
