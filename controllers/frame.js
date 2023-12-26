@@ -4,8 +4,7 @@ const { sendCreateFrameMail } = require('../services/email')
 const {
   getFramelist,
   poseFrame,
-  getSingleFrame,
-  deleteFrame,
+  deleteFrame
 } = require('../utils/frame')
 const { usePlan, checkPlan } = require('../utils/user')
 
@@ -125,20 +124,12 @@ const getAllFrames = async (req, res) => {
 const getOneFrame = async (req, res) => {
   const { id } = req.params
   try {
-    let frame = {}
-    const filter = {}
-    if (id) {
-      filter.id = id
-      frame = await getSingleFrame(Frame, filter)
-      if (!frame) {
-        throw new Error('pas de frame trouvé')
+    const frame = await Frame.findById(id)
+    return res.json({
+      frame: {
+        frame
       }
-
-      res.status(200).json({
-        frame: frame,
-        message: 'Frame supprimé avec succes',
-      })
-    }
+    })
   } catch (error) {
     console.log(error)
     res.status(501).json(error)
@@ -148,19 +139,11 @@ const getOneFrame = async (req, res) => {
 const deleteOneFrame = async (req, res) => {
   const { id } = req.params
   try {
-    let frame = {}
     const filter = {}
     if (id) {
       filter.id = id
-      frame = await deleteFrame(Frame, filter)
-      if (!frame) {
-        throw new Error('pas de frame trouvé')
-      }
-
-      res.status(200).json({
-        frame: frame,
-        message: 'Frame trouvé',
-      })
+      await deleteFrame(Frame, filter)
+      res.status(201).json({success: true})
     }
   } catch (error) {
     console.log(error)
