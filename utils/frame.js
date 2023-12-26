@@ -182,12 +182,18 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
       throw new Error('Plan inexistant pour ce frame')
     }
     const plan = user.abonnements.find((abo) => abo.id == frameExist.planId)
-    if (frameExist.usedBy.length >= plan.maxUser) {
+    if (plan.usedBy && plan.usedBy >= plan.maxUser) {
       throw new Error('Utilisations depassées')
     }
 
-    const remaining = plan.maxUser - frameExist.usedBy.length
-    if(remaining <= 5){
+    const usedBy = plan.usedBy ? plan.usedBy++ : 1
+
+    const abonnements = user.abonnements.map((abo) =>
+      abo.id == frameExist.planId ? { ...abo, usedBy } : abo
+    )
+
+    const remaining = plan.maxUser - plan.usedBy
+    if (remaining <= 5) {
       sendPlanFansExpiryMail(user, remaining)
     }
 
@@ -220,6 +226,7 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
     if (!finalImageUrl) {
       throw new Error("Impossible d'envoyer L'image à cloudinary")
     }
+    await User.findOneAndUpdate({ _id: { $eq: user._id } }, { abonnements })
     const addUserInUsedFrame = await frameEntity.update(
       { _id: { $eq: frameId } },
       { $push: { usedBy: userId }, maxUser: 15 }
