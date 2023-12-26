@@ -39,6 +39,7 @@ const frameSchema = new Schema(
 )
 
 frameSchema.plugin(uniqueValidator)
+frameSchema.index({'$**': 'text'});
 const Frame = mongoose.model('frame', frameSchema)
 
 module.exports = { Frame }

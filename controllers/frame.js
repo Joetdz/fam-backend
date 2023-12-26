@@ -1,11 +1,7 @@
 const { Frame } = require('..//models/frame')
 const { User } = require('../models/user')
 const { sendCreateFrameMail } = require('../services/email')
-const {
-  getFramelist,
-  poseFrame,
-  deleteFrame
-} = require('../utils/frame')
+const { getFramelist, poseFrame, deleteFrame } = require('../utils/frame')
 const { usePlan, checkPlan } = require('../utils/user')
 
 const createFrame = async (req, res) => {
@@ -76,21 +72,15 @@ const getAllFrames = async (req, res) => {
         throw new Error('pas de frames crée par cet utilisateur')
       }
 
-      res.status(200).json({
-        frames: allFrames.frames,
-        messega: 'Tous les frames recupérés avec succès ft',
-      })
+      res.status(200).json(allFrames.frames)
     } else if (query) {
-      filter.query = query
-      allFrames = await getFramelist(Frame, filter)
-      if (allFrames && allFrames.frames.length == 0) {
-        throw new Error('pas de frames crée par cet utilisateur')
-      }
-
-      res.status(200).json({
-        frames: allFrames.frames,
-        messega: 'Tous les frames recupérés avec succès ft',
+      const frames = await Frame.find({
+        $or: [
+          {description: { $regex: query, $options: 'i'}},
+          {name: { $regex: query, $options: 'i'}}
+        ]
       })
+      return res.json(frames)
     } else if (page && limit) {
       filter.page = page
       filter.limit = limit
@@ -105,15 +95,9 @@ const getAllFrames = async (req, res) => {
         messega: 'Tous les frames recupérés avec succès',
       })
     } else {
-      allFrames = await getFramelist(Frame)
-      if (!allFrames) {
-        throw new Error('pas de frames crée par cet utilisateur')
-      }
+      const frames = await Frame.find()
 
-      res.status(200).json({
-        frames: allFrames,
-        messega: 'Tous les frames recupérés avec succès ',
-      })
+      return res.status(200).json(frames)
     }
   } catch (error) {
     console.log(error)
@@ -127,8 +111,8 @@ const getOneFrame = async (req, res) => {
     const frame = await Frame.findById(id)
     return res.json({
       frame: {
-        frame
-      }
+        frame,
+      },
     })
   } catch (error) {
     console.log(error)
@@ -143,7 +127,7 @@ const deleteOneFrame = async (req, res) => {
     if (id) {
       filter.id = id
       await deleteFrame(Frame, filter)
-      res.status(201).json({success: true})
+      res.status(201).json({ success: true })
     }
   } catch (error) {
     console.log(error)

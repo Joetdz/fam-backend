@@ -64,6 +64,7 @@ const insertFrame = async (frame, Frame, User, abonnement) => {
 }
 const getFramelist = async (Frame, filter) => {
   try {
+    console.log(filter.query)
     const frames =
       filter && filter.createdBy && !filter.query
         ? await Frame.find({
@@ -71,27 +72,18 @@ const getFramelist = async (Frame, filter) => {
             deleted: false,
           })
         : filter && filter.query
-          ? await Frame.find({
-              $or: [
-                {
-                  name: { $regex: new RegExp(filter.query, 'i') },
-                  deleted: false,
-                },
-                {
-                  description: { $regex: new RegExp(filter.query, 'i') },
-                  deleted: false,
-                },
-              ],
-            })
+          ? await Frame.find({$text: {$search: "a", $caseSensitive: false}})
           : filter && filter.page && filter.limit
             ? await Frame.find({ deleted: false })
                 .limit(filter.limit * 1)
                 .skip((filter.page - 1) * filter.limit)
             : await Frame.find({ deleted: false })
 
-    if (!frames || frames.length === 0) {
-      throw new Error('Aucun frame trouvé')
-    }
+    // if (!frames || frames.length === 0) {
+    //   throw new Error('Aucun frame trouvé')
+    // }
+
+    console.log(frames)
 
     return {
       frames: frames,
