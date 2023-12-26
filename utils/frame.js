@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { createCanvas, loadImage } = require('canvas')
 const { User } = require('../models/user')
+const { sendPlanFansExpiryMail } = require('../services/email')
 
 async function checkAvailability(arr, val) {
   return val ? arr.find((arrVal) => val === arrVal) : 'Free'
@@ -41,7 +42,6 @@ const insertFrame = async (frame, Frame, User, abonnement) => {
         { facebookId: frame.createdBy },
         {
           $push: { frames: newFrame.name },
-          abonnement: userCheck.abonnement - 1,
         }
       )
     }
@@ -66,19 +66,28 @@ const getFramelist = async (Frame, filter) => {
   try {
     const frames =
       filter && filter.createdBy && !filter.query
-        ? await Frame.find({ createdBy: { $eq: filter.createdBy } })
+        ? await Frame.find({
+            createdBy: { $eq: filter.createdBy },
+            deleted: false,
+          })
         : filter && filter.query
           ? await Frame.find({
               $or: [
-                { name: { $regex: new RegExp(filter.query, 'i') } },
-                { description: { $regex: new RegExp(filter.query, 'i') } },
+                {
+                  name: { $regex: new RegExp(filter.query, 'i') },
+                  deleted: false,
+                },
+                {
+                  description: { $regex: new RegExp(filter.query, 'i') },
+                  deleted: false,
+                },
               ],
             })
           : filter && filter.page && filter.limit
-            ? await Frame.find()
+            ? await Frame.find({ deleted: false })
                 .limit(filter.limit * 1)
                 .skip((filter.page - 1) * filter.limit)
-            : await Frame.find()
+            : await Frame.find({ deleted: false })
 
     if (!frames || frames.length === 0) {
       throw new Error('Aucun frame trouvé')
@@ -117,11 +126,17 @@ const getSingleFrame = async (Frame, filter) => {
 }
 const deleteFrame = async (Frame, filter) => {
   try {
-    const frame = await Frame.findByIdAndDelete({
-      _id: filter.id,
-    })
-    if (!frame) {
-      throw new Error('Aucun frame trouvé')
+    const frame = await Frame.update(
+      {
+        _id: { $eq: filter.id },
+      },
+      {
+        deleted: true,
+        description: 'yes',
+      }
+    )
+    if (frame.modifiedCount === 0) {
+      throw new Error("La frame n'est pas supprimée")
     }
     return {
       frame: frame,
@@ -167,8 +182,19 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
       throw new Error('Plan inexistant pour ce frame')
     }
     const plan = user.abonnements.find((abo) => abo.id == frameExist.planId)
-    if (frameExist.usedBy.length >= plan.maxUser) {
+    if (plan.usedBy && plan.usedBy >= plan.maxUser) {
       throw new Error('Utilisations depassées')
+    }
+
+    const usedBy = plan.usedBy ? plan.usedBy++ : 1
+
+    const abonnements = user.abonnements.map((abo) =>
+      abo.id == frameExist.planId ? { ...abo, usedBy } : abo
+    )
+
+    const remaining = plan.maxUser - plan.usedBy
+    if (remaining <= 5) {
+      sendPlanFansExpiryMail(user, remaining)
     }
 
     const frame = await loadImage(frameExist.imgUrl)
@@ -200,6 +226,7 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
     if (!finalImageUrl) {
       throw new Error("Impossible d'envoyer L'image à cloudinary")
     }
+    await User.findOneAndUpdate({ _id: { $eq: user._id } }, { abonnements })
     const addUserInUsedFrame = await frameEntity.update(
       { _id: { $eq: frameId } },
       { $push: { usedBy: userId }, maxUser: 15 }

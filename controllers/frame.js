@@ -1,10 +1,12 @@
 const { Frame } = require('..//models/frame')
+const { User } = require('../models/user')
+const { sendCreateFrameMail } = require('../services/email')
 const {
   getFramelist,
   poseFrame,
   deleteFrame
 } = require('../utils/frame')
-const { usePlan } = require('../utils/user')
+const { usePlan, checkPlan } = require('../utils/user')
 
 const createFrame = async (req, res) => {
   const { createdBy, name, description, imgUrl, planId } = req.body
@@ -16,6 +18,7 @@ const createFrame = async (req, res) => {
     // Check if user has the selected plan and use it
     const abonmentId = await usePlan(createdBy, planId)
     if (!abonmentId) return res.status(401)
+
     const newFrame = await Frame.create({
       createdBy,
       name,
@@ -23,12 +26,40 @@ const createFrame = async (req, res) => {
       description,
       planId: abonmentId,
     })
+    const user = await User.findById(createdBy)
+    if (user && user.email) {
+      sendCreateFrameMail(user)
+    }
     return res.status(200).json({
       frame: newFrame,
     })
   } catch (error) {
     console.log(error)
     res.status(500).json({ message: 'Something went wrong' })
+  }
+}
+
+const upGradeFramPlan = async (req, res) => {
+  const { frameId, planId, createdBy } = req.body
+  try {
+    if (!frameId | !planId | createdBy)
+      throw new Error('Vous devez fournir frameId , planId et createdBy')
+
+    const abonmentId = await checkPlan(createdBy, planId)
+    if (!abonmentId) return res.status(401)
+    const updateFramePlan = await Frame.updateOne(
+      {
+        _id: { $eq: frameId },
+      },
+      { planId: abonmentId }
+    )
+
+    if (!updateFramePlan.modifiedCount === 0)
+      throw new Error('Le changement de plan n est pas passé ')
+    return res.status(200).json({ message: updateFramePlan })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: error.message })
   }
 }
 
@@ -141,4 +172,5 @@ module.exports = {
   createFanFram,
   getOneFrame,
   deleteOneFrame,
+  upGradeFramPlan,
 }

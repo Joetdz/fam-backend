@@ -86,7 +86,7 @@ const usePlan = async (userId, planId) => {
       return id
     }
     const selectedPlan = user.abonnements.find((abo) => abo.id == planId)
-    if (!selectedPlan || selectedPlan?.used) return null
+    if (!selectedPlan) return null
     const abonnements = user.abonnements.map((abo) =>
       abo.id != planId ? abo : { ...abo, used: true }
     )
@@ -97,5 +97,25 @@ const usePlan = async (userId, planId) => {
     return null
   }
 }
-
-module.exports = { signupOrsignin, getSingleUser, getUserList, usePlan }
+const checkPlan = async (userId, planId) => {
+  try {
+    const user = await User.findOne({
+      _id: { $eq: userId },
+    })
+    if (!user) throw new Error('Aucun utilisateur trouvé avec cette id')
+    if (!planId) throw new Error("Vous n'avez pas selecetionner une plan ")
+    const selectedPlan = user.abonnements.find((abo) => abo.id == planId)
+    if (!selectedPlan) throw new Error('Aucun Plan  trouvé avec cette id')
+    return planId
+  } catch (error) {
+    console.log(error)
+    return null
+  }
+}
+module.exports = {
+  signupOrsignin,
+  getSingleUser,
+  getUserList,
+  usePlan,
+  checkPlan,
+}

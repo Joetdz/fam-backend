@@ -18,9 +18,9 @@ const saveAbonnement = async (userId, userEntity, myPayement) => {
     if (!savePayement) {
       throw new Error("impossible d'enregistrer le paiement")
     }
-    const from = `${process.env.EMAIL_FROM}`
+    const from = `FanFrame <contact@televerx.com>`
     const to = `joeltondozi@gmail.com`
-    const subject = ` Confirmation de paiement - Abonnement FanFrame.co `
+    const subject = `Confirmation de paiement - Abonnement FanFrame.co `
     const text = `Cher(e)  ${userExit.name}`
     const html = `<h2 style="color: black;">Cher(e)  ${userExit.name}</h2>
 <p style="color: black;">Merci pour votre confiance ! Votre paiement pour l'abonnement <a href="https://fanframe.co/">FanFrame.co<a/> a bien été reçu.</p>
@@ -29,9 +29,9 @@ const saveAbonnement = async (userId, userEntity, myPayement) => {
   <li>Plan : <strong style="color: black;">${planName}</strong></li>
   <li>Durée : <strong style="color: black;">1 mois</strong></li>
   <li>Prix : <strong><span style="color: black;">$${
-    (planName === 'Basic' && '9') ||
-    (planName === 'Standard' && '29') ||
-    (planName === 'Premium' && '99')
+    (planName === 'Basic' && '9$') ||
+    (planName === 'Standard' && '29$') ||
+    (planName === 'Premium' && '99$')
   }</span></strong></li>
 </ul>  <p style="color: black;">Votre abonnement est désormais actif. Profitez pleinement de votre expérience sur FanFrame.co.
 Si vous avez des questions, n’hésitez pas à nous contacter à ${
@@ -43,7 +43,6 @@ Bien à vous,<p/>
 <strong style="color: black;">L'équipe <strong/> <a href="https://fanframe.co/">FanFrame.co<a/><br/>
 <img src="https://www.fanframe.co/_next/image?url=%2Fassets%2Ffanframe.png&w=128&q=75" alt="Logo FanFrame.co">
 `
-
     const mailOptions = {
       from,
       to,
@@ -51,12 +50,8 @@ Bien à vous,<p/>
       text,
       html,
     }
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        res.status(500).json({ error: err })
-      } else {
-        res.status(200).json({ success: true, info: info })
-      }
+    transporter.sendMail(mailOptions, (err) => {
+      if(err) console.log(err)
     })
 
     return {
