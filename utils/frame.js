@@ -64,7 +64,6 @@ const insertFrame = async (frame, Frame, User, abonnement) => {
 }
 const getFramelist = async (Frame, filter) => {
   try {
-    console.log(filter.query)
     const frames =
       filter && filter.createdBy && !filter.query
         ? await Frame.find({
@@ -82,8 +81,6 @@ const getFramelist = async (Frame, filter) => {
     // if (!frames || frames.length === 0) {
     //   throw new Error('Aucun frame trouvé')
     // }
-
-    console.log(frames)
 
     return {
       frames: frames,
@@ -178,13 +175,13 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
       throw new Error('Utilisations depassées')
     }
 
-    const usedBy = plan.usedBy ? plan.usedBy++ : 1
+    const usedBy = plan.usedBy ? plan.usedBy + 1 : 1
 
     const abonnements = user.abonnements.map((abo) =>
       abo.id == frameExist.planId ? { ...abo, usedBy } : abo
     )
 
-    const remaining = plan.maxUser - plan.usedBy
+    const remaining = plan.usedBy ? plan.maxUser - plan.usedBy : plan.maxUser
     if (remaining <= 5) {
       sendPlanFansExpiryMail(user, remaining)
     }
@@ -219,15 +216,10 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
       throw new Error("Impossible d'envoyer L'image à cloudinary")
     }
     await User.findOneAndUpdate({ _id: { $eq: user._id } }, { abonnements })
-    const addUserInUsedFrame = await frameEntity.update(
+    await frameEntity.update(
       { _id: { $eq: frameId } },
       { $push: { usedBy: userId }, maxUser: 15 }
     )
-    if (!addUserInUsedFrame) {
-      throw new Error(
-        "impossible d'ajouter le user dans la liste des users du frame"
-      )
-    }
     return {
       finalImageUrl: finalImageUrl,
       error: null,

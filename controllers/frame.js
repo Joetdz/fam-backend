@@ -61,7 +61,6 @@ const upGradeFramPlan = async (req, res) => {
 
 const getAllFrames = async (req, res) => {
   const { createdBy, query, page, limit } = req.query
-  console.log('createdBy', createdBy)
   try {
     let allFrames = []
     const filter = {}
