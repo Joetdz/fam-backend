@@ -75,11 +75,11 @@ const getAllFrames = async (req, res) => {
     } else if (query) {
       const frames = await Frame.find({
         $or: [
-          {description: { $regex: query, $options: 'i'}},
-          {name: { $regex: query, $options: 'i'}}
-        ]
+          { description: { $regex: query, $options: 'i' }},
+          { name: { $regex: query, $options: 'i' }},
+        ],
       })
-      return res.json(frames)
+      return res.json(frames.filter((f) => !f.deleted))
     } else if (page && limit) {
       filter.page = page
       filter.limit = limit
@@ -96,7 +96,7 @@ const getAllFrames = async (req, res) => {
     } else {
       const frames = await Frame.find()
 
-      return res.status(200).json(frames)
+      return res.status(200).json(frames.filter((f) => !f.deleted))
     }
   } catch (error) {
     console.log(error)
