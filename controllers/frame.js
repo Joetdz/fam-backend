@@ -140,12 +140,15 @@ const createFanFram = async (req, res) => {
   // console.log('url', imgUrl, frameUrl)
   try {
     const result = await poseFrame(imgUrl, frameId, userId, Frame)
+    if(result.error) {
+      return res.status(500).json(result.error)
+    }
     res.status(200).json({
       frames: result,
     })
   } catch (error) {
     console.log(error)
-    res.status(501).json(error)
+    res.status(500).json(error)
   }
 }
 

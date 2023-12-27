@@ -226,7 +226,7 @@ const poseFrame = async (imageUrl, frameId, userId, frameEntity) => {
     }
   } catch (error) {
     console.log(error)
-    return { finalImageUrl: null, error: error.message }
+    return { finalImageUrl: null, error: error }
   }
 }
 
