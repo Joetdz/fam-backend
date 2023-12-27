@@ -30,7 +30,7 @@ const sendCreateFrameMail = async (user) => {
       <table>
         <tbody>
           <tr>
-            <td>Cher ${user.name},</td>
+            <td>cher(e) ${user.name},</td>
           </tr>
           <tr>
             <td><br></td>
@@ -68,6 +68,9 @@ const sendCreateFrameMail = async (user) => {
           </tr>
         </tbody>
       </table>
+      <center>
+      <img src="https://www.fanframe.co/_next/image?url=%2Fassets%2Ffanframe.png&w=128&q=75" alt="Logo FanFrame.co">
+      </center>
     </body>
     </html>
     `,
@@ -97,7 +100,7 @@ const sendPlanFansExpiryMail = async (user, remaining) => {
       <table>
         <tbody>
           <tr>
-            <td>Cher ${user.name},</td>
+            <td>cher(e) ${user.name},</td>
           </tr>
           <tr>
             <td><br></td>
@@ -126,6 +129,9 @@ const sendPlanFansExpiryMail = async (user, remaining) => {
           </tr>
         </tbody>
       </table>
+      <center>
+      <img src="https://www.fanframe.co/_next/image?url=%2Fassets%2Ffanframe.png&w=128&q=75" alt="Logo FanFrame.co">
+      </center>
     </body>
     </html>
     `,
@@ -136,4 +142,71 @@ const sendPlanFansExpiryMail = async (user, remaining) => {
   )
 }
 
-module.exports = { transporter, sendCreateFrameMail, sendPlanFansExpiryMail }
+const sendExpiredFrameUsedMail = async (user, frame) => {
+  if(!user.email) return
+
+  transporter.sendMail(
+    {
+      from: '"FanFrame" <infos.fanframe.co>',
+      to: user.email,
+      subject: 'Mise à jour de votre frame pour atteindre plus de fans',
+      html: `
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Enregistrement de votre frame</title>
+    </head>
+    <body>
+      <table>
+        <tbody>
+          <tr>
+            <td>cher(e) ${user.name},</td>
+          </tr>
+          <tr>
+            <td><br></td>
+          </tr>
+          <tr>
+            <td>
+              Nous tenons à vous informer que votre frame '${frame.name}' sur notre plateforme a déjà atteint le nombre maximum de fans, mais un fan vient d'essayer de l'utiliser.
+            </td>
+          </tr>
+          <tr>
+            <td>
+            <br />
+            Si vous souhaitez continuer à permettre à vos fans d'utiliser votre frame et d'étendre votre visibilité, nous vous encourageons à envisager de passer à notre plan premium, qui vous offrira un nombre illimité d'utilisations pour vos frames, ainsi que d'autres fonctionnalités exclusives pour interagir avec votre communauté.</td>
+          </tr>
+          <tr>
+            <td>
+            <br />
+            Si non vous pouvez supprimer la frame dans votre espace profile afin qu'elle ne soit plus visible sur notre plateforme.</td>
+          </tr>
+          <tr>
+            <td>
+              <br>
+              Une question? Une préoccupation? N'hésitez pas à répondre à ce mail.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <br>
+              Cordialement, l'équipe <a style="text-decoration: none;" href="https://fanframe.co">fanframe.co</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <center>
+      <img src="https://www.fanframe.co/_next/image?url=%2Fassets%2Ffanframe.png&w=128&q=75" alt="Logo FanFrame.co">
+      </center>
+    </body>
+    </html>
+    `,
+    },
+    (error) => {
+      if (error) console.log(error)
+    }
+  )
+}
+
+module.exports = { transporter, sendCreateFrameMail, sendPlanFansExpiryMail, sendExpiredFrameUsedMail }
