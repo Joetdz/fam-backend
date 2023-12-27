@@ -18,8 +18,8 @@ const saveAbonnement = async (userId, userEntity, myPayement) => {
     if (!savePayement) {
       throw new Error("impossible d'enregistrer le paiement")
     }
-    const from = `FanFrame <contact@televerx.com>`
-    const to = `joeltondozi@gmail.com`
+    const from = `FanFrame <contact@fanframe.co>`
+    const to = userExit.email
     const subject = `Confirmation de paiement - Abonnement FanFrame.co `
     const text = `Cher(e)  ${userExit.name}`
     const html = `<h2 style="color: black;">Cher(e)  ${userExit.name}</h2>
@@ -41,18 +41,22 @@ Si vous avez des questions, n’hésitez pas à nous contacter à ${
 
 Bien à vous,<p/>
 <strong style="color: black;">L'équipe <strong/> <a href="https://fanframe.co/">FanFrame.co<a/><br/>
+<center>
 <img src="https://www.fanframe.co/_next/image?url=%2Fassets%2Ffanframe.png&w=128&q=75" alt="Logo FanFrame.co">
+</center>
 `
-    const mailOptions = {
-      from,
-      to,
-      subject,
-      text,
-      html,
+    if (userExit.email) {
+      const mailOptions = {
+        from,
+        to,
+        subject,
+        text,
+        html,
+      }
+      transporter.sendMail(mailOptions, (err) => {
+        if (err) console.log(err)
+      })
     }
-    transporter.sendMail(mailOptions, (err) => {
-      if(err) console.log(err)
-    })
 
     return {
       sucessPayment: 'paiement sauvegarder avec succès',
